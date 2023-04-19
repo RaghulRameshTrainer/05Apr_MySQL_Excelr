@@ -1,0 +1,190 @@
+INT		-->  INTEGER , NUMBER
+VARCHAR  --> VARCHAR2
+
+DECLARE
+	<Declaration Session>
+BEGIN
+	<Executale commands>
+	EXCEPTION
+    	<Exception Handling>
+END;
+/
+
+
+DECLARE
+	message VARCHAR2(20) := 'Hello World!';
+BEGIN
+	dbms_output.put_line(message);
+	DBMS_OUTPUT.PUT_LINE('Welcome to PLSQL World!');
+END;
+/
+
+-- IF ELSE
+
+DECLARE
+	x INTEGER := 100;
+BEGIN
+	IF(x = 100) THEN
+    	dbms_output.put_line('Hundred');
+	ELSE
+        dbms_output.put_line('Value of x is :' || x);
+	END IF;
+END;
+/
+
+
+DECLARE
+	x INTEGER := 1000;
+BEGIN
+	IF(x = 100) THEN
+    	dbms_output.put_line('Hundred');
+	ELSE
+        dbms_output.put_line('Value of x is :' || x);
+	END IF;
+END;
+/
+
+
+
+DECLARE
+	x INTEGER := 1000;
+BEGIN
+	IF(x = 100) THEN
+    	dbms_output.put_line('Hundred');
+	ELSIF(x = 200) THEN
+        dbms_output.put_line('Two Hundred');
+	ELSIF(x = 500) THEN
+        dbms_output.put_line('Fuve Hundred');
+	ELSIF(x = 1000) THEN
+        dbms_output.put_line('THOUSAND');
+	ELSE
+        dbms_output.put_line('Value of x is :' || x);
+	END IF;
+END;
+/
+
+
+
+DECLARE
+	x INTEGER := 10000;
+BEGIN
+	IF(x = 100) THEN
+    	dbms_output.put_line('Hundred');
+	ELSIF(x = 200) THEN
+        dbms_output.put_line('Two Hundred');
+	ELSIF(x = 500) THEN
+        dbms_output.put_line('Fuve Hundred');
+	ELSIF(x = 1000) THEN
+        dbms_output.put_line('THOUSAND');
+	ELSE
+        dbms_output.put_line('Value of x is :' || x);
+	END IF;
+END;
+/
+
+
+
+-- LOOP ( LOOP, WHILE LOOP, FOR LOOP)
+
+DECLARE
+	x INTEGER := 1;
+BEGIN
+	LOOP
+		dbms_output.put_line(x);
+		x := x + 1;
+		IF(x>10) THEN
+            exit;
+		END IF;
+    END LOOP;
+END;
+/
+
+
+DECLARE
+	x INTEGER := 1;
+BEGIN
+	WHILE x <= 20 LOOP
+		dbms_output.put_line(x);
+		x := x + 1;
+    END LOOP;
+END;
+/
+
+-- FOR LOOP
+
+DECLARE
+	x INTEGER;
+BEGIN
+	FOR x IN 90 .. 100 LOOP
+    	dbms_output.put_line('x is : '|| x);
+    END LOOP;
+END;
+/
+
+-- PROCEDURE
+
+CREATE OR REPLACE PROCEDURE welcome
+AS
+BEGIN
+	dbms_output.put_line('Welcome Everyone to EXCELR!');
+END;
+/
+
+-- 2 ways to call the procedure
+	-- 1. EXECUTE
+	-- 2. Calling it from PLSQL block
+
+
+EXECUTE welcome;
+
+BEGIN
+	welcome;
+END;
+/
+
+-- Parameters 
+	-- IN
+	-- OUT
+	-- IN OUT
+
+-- Create a procedure to find a big number
+
+
+DECLARE
+	a INTEGER;
+	b INTEGER;
+	c INTEGER;
+	PROCEDURE findMax(x IN integer, y IN integer, z OUT integer) IS
+BEGIN
+	IF x > y THEN
+        z := x;
+	ELSE
+		z := y;
+	END IF;
+END;
+BEGIN
+	a := 100;
+	b := 200;
+	findMax(a,b,c);
+	dbms_output.put_line('Maximum of (100,200) is : ' || c);
+END;
+/
+
+
+DECLARE
+	a integer;
+	PROCEDURE squareNumber(x IN OUT integer) IS
+BEGIN
+	x := x * x;
+END;
+BEGIN
+	a := 10;
+	squareNumber(a);
+	dbms_output.put_line('Square of 10 is: ' || a );
+END;
+/
+
+
+
+
+
