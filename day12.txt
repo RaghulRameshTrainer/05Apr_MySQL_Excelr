@@ -1,0 +1,222 @@
+-- FUNCTION
+
+-- Function is same as a procedure except that it returns a value. A FUNCTION MUST RETURN A VALUE
+
+CREATE TABLE CUSTOMER(
+    cust_id INTEGER,
+    cust_name VARCHAR2(100),
+    AGE INTEGER,
+    GENDER CHAR(1),
+    BALANCE INTEGER
+);
+
+INSERT INTO CUSTOMER VALUES(1,'Ramesh',38,'M',100000);
+INSERT INTO CUSTOMER VALUES(2,'Malini',32,'F',200000);
+INSERT INTO CUSTOMER VALUES(3,'Ashwin',22,'M',50000);
+INSERT INTO CUSTOMER VALUES(4,'Tharani',31,'F',150000);
+INSERT INTO CUSTOMER VALUES(5,'Raghul',37,'M',250000);
+
+SELECT * FROM CUSTOMER;
+
+CREATE OR REPLACE FUNCTION totalCustomers
+RETURN INTEGER IS
+	total INTEGER ;
+BEGIN
+	SELECT COUNT(*) INTO total  FROM CUSTOMER;
+	RETURN total;
+END;
+/
+
+DECLARE
+    tot INTEGER;
+BEGIN
+	tot := totalCustomers();
+	dbms_output.put_line('Total Number of Customers : ' || tot);
+END;
+/
+
+INSERT INTO CUSTOMER VALUES(6,'Aditya',30,'M',300000);
+
+
+CREATE OR REPLACE FUNCTION MaxBalance
+RETURN INTEGER IS
+	mb INTEGER ;
+BEGIN
+	SELECT MAX(BALANCE) INTO mb  FROM CUSTOMER;
+	RETURN mb;
+END;
+/
+
+DECLARE
+    max_bal INTEGER;
+BEGIN
+	max_bal := MaxBalance();
+	dbms_output.put_line('Maximum Balance is : ' || max_bal);
+END;
+/
+
+
+
+
+DECLARE
+	a INTEGER;
+	b INTEGER;
+	c INTEGER;
+	FUNCTION findMax(x IN integer, y IN integer) 
+        RETURN INTEGER IS
+        z INTEGER;
+BEGIN
+	IF x > y THEN
+        z := x;
+	ELSE
+		z := y;
+	END IF;
+	RETURN z;
+END;
+BEGIN
+	a := 100;
+	b := 200;
+	c := findMax(a,b);
+	dbms_output.put_line('Maximum of (100,200) is : ' || c);
+END;
+/
+
+
+DECLARE
+	c_id INTEGER;
+	c_name VARCHAR2(100);
+	FUNCTION getCustName(id IN INTEGER)
+	RETURN VARCHAR IS
+		c_name VARCHAR2(100);
+	BEGIN
+		SELECT cust_name INTO c_name FROM CUSTOMER WHERE cust_id=id;
+		RETURN c_name;
+	END;
+	BEGIN
+        c_id := 2;
+        c_name := getCustName(c_id);
+		dbms_output.put_line('Customer name is : '|| c_name);
+	END;
+	/
+
+-- DIFFERENCE B/W PROCEDURE and FUNCTION
+
+PROCEDURE																	FUNCTION
+Does not return a value														Must return a value
+Parameter type: IN, OUT, IN OUT												IN
+It is used for logical ops													Used for arithmetic operations
+Cannot be used/called in select statement									Can be used in select statement
+
+SELECT * FROM CUSTOMER;
+
+CREATE OR REPLACE FUNCTION bonus(bal INTEGER)
+RETURN INTEGER IS
+	bonus_amt INTEGER;
+BEGIN
+	bonus_amt := bal * 0.1;
+	RETURN bonus_amt;
+END;
+/
+
+
+SELECT CUST_ID, CUST_NAME, AGE, GENDER, BALANCE,bonus(BALANCE) as bonus_amount FROM CUSTOMER;
+
+DECLARE
+    c_id INTEGER := 0;
+	customer_name VARCHAR2(100);
+	customer_balance INTEGER;
+	invalid_cust_id EXCEPTION;
+BEGIN
+    IF c_id <= 0 THEN
+    	RAISE invalid_cust_id;
+	ELSE
+    	SELECT cust_name, balance INTO customer_name,customer_balance FROM CUSTOMER WHERE cust_id = c_id;
+    	DBMS_OUTPUT.PUT_LINE('Customer Name : ' || customer_name );
+    	DBMS_OUTPUT.PUT_LINE('Customer Balance : ' || customer_balance );	
+        -- SELECT 5/0 INTO customer_name FROM CUSTOMER;
+	END IF;
+
+	EXCEPTION
+        WHEN no_data_found THEN
+			DBMS_OUTPUT.PUT_LINE('Please check the customer id');
+		WHEN too_many_rows THEN
+            DBMS_OUTPUT.PUT_LINE('Got multiple values, Please check');
+		WHEN zero_divide THEN
+            DBMS_OUTPUT.PUT_LINE('Cant divide by zero!');
+		WHEN invalid_cust_id THEN
+            DBMS_OUTPUT.PUT_LINE('Customer is must be 1 or above');
+		WHEN others THEN
+            DBMS_OUTPUT.PUT_LINE('Please check , there is an issue');
+END;
+/
+
+
+-- CURSOR
+-- Implicit Cursors
+-- Explicit Cursors
+
+SELECT * FROM CUSTOMER;
+
+DECLARE
+	c_name VARCHAR2(100);
+	c_age INTEGER;
+	c_gender CHAR(1);
+	c_balance INTEGER;
+	CURSOR cust_data IS
+		SELECT cust_name, age, gender, balance FROM CUSTOMER;
+BEGIN
+	OPEN cust_data;
+	LOOP
+		FETCH cust_data INTO c_name, c_age, c_gender, c_balance;
+			EXIT WHEN cust_data%notfound;
+			dbms_output.put_line(c_name || '  ' || c_age || '  '|| c_gender || '  '|| c_balance);
+	END LOOP;
+	CLOSE cust_data;
+END;
+/
+
+-- TRIGGER
+
+BEFORE || AFTER || INSTEAD OF
+{DELETE OR UPDATE OR INSERT}
+
+SELECT * FROM CUSTOMER;
+
+
+CREATE TABLE ALUMNI(
+    cust_id INTEGER,
+    cust_name VARCHAR2(100),
+    AGE INTEGER,
+    GENDER CHAR(1),
+    BALANCE INTEGER
+);
+
+SELECT * FROM CUSTOMER;
+
+SELECT * FROM ALUMNI;
+
+
+CREATE OR REPLACE TRIGGER move_cust_data
+BEFORE DELETE ON CUSTOMER
+FOR EACH ROW
+BEGIN
+	INSERT INTO ALUMNI VALUES(:OLD.CUST_ID, :OLD.CUST_NAME, :OLD.AGE, :OLD.GENDER, :OLD.BALANCE);
+	DBMS_OUTPUT.PUT_LINE('Customer :' || :OLD.cust_name || ' data has been loaded into ALUMNI table');
+END;
+/
+
+DELETE FROM CUSTOMER WHERE cust_id=4;
+DELETE FROM CUSTOMER WHERE cust_id=3;
+DELETE FROM CUSTOMER WHERE cust_id IN (2,6);
+
+
+CREATE OR REPLACE TRIGGER insert_cust_data
+BEFORE INSERT ON CUSTOMER
+FOR EACH ROW
+BEGIN
+	INSERT INTO ALUMNI VALUES(:NEW.CUST_ID, :NEW.CUST_NAME, :NEW.AGE, :NEW.GENDER, :NEW.BALANCE);
+	DBMS_OUTPUT.PUT_LINE('Customer :' || :NEW.cust_name || ' data has been loaded into ALUMNI table');
+END;
+/
+
+INSERT INTO CUSTOMER VALUES(7,'Siva',50,'M',1000000);
